@@ -281,12 +281,16 @@
   /* ── TOUCH DEVICES: vertical scroll-through (portrait + landscape) ── */
   @media (pointer: coarse){
     html,body{overflow:auto !important;height:auto !important;}
+    html{scroll-snap-type:y proximity;scroll-padding-top:0;}
     body{overflow-x:hidden !important;}
     .shell{position:static;inset:auto;margin:8px;min-height:calc(100svh - 16px);overflow:visible;}
     .shell::before,.shell::after{display:none;}
     .stage{position:static;display:block;flex:none;min-height:0;}
+    /* each slide is a full page; proximity-snap lands the next page fully without
+       trapping the slides that are taller than the viewport (they stay scrollable) */
     .slide{position:static;inset:auto;opacity:1 !important;visibility:visible !important;
-      min-height:92vh;min-height:92svh;padding:8vh 7vw;border-bottom:1px solid var(--line);}
+      min-height:100vh;min-height:100svh;padding:8vh 7vw;border-bottom:1px solid var(--line);
+      scroll-snap-align:start;scroll-snap-stop:always;}
     .slide:last-of-type{border-bottom:0;}
     /* everything visible — entrance animations need slide-activation that doesn't fire on scroll */
     .reveal,.seqfade{opacity:1 !important;transform:none !important;}
