@@ -277,6 +277,29 @@
     .flow3{grid-template-columns:1fr;} .conn{transform:rotate(90deg);height:28px;}
     .shocks,.chips,.proof,.prov{grid-template-columns:1fr;}
   }
+
+  /* ── TOUCH DEVICES: vertical scroll-through (portrait + landscape) ── */
+  @media (pointer: coarse){
+    html,body{overflow:auto !important;height:auto !important;}
+    body{overflow-x:hidden !important;}
+    .shell{position:static;inset:auto;margin:8px;min-height:calc(100svh - 16px);overflow:visible;}
+    .shell::before,.shell::after{display:none;}
+    .stage{position:static;display:block;flex:none;min-height:0;}
+    .slide{position:static;inset:auto;opacity:1 !important;visibility:visible !important;
+      min-height:92vh;min-height:92svh;padding:8vh 7vw;border-bottom:1px solid var(--line);}
+    .slide:last-of-type{border-bottom:0;}
+    /* everything visible — entrance animations need slide-activation that doesn't fire on scroll */
+    .reveal,.seqfade{opacity:1 !important;transform:none !important;}
+    .slide .reveal,.slide.in .reveal,.slide.in .seqfade,.slide.in .pop,.slide.in .kw,
+    .slide.in .kw.amb,.slide.in .kw.rd,.slide.in .two .calm,
+    .slide.in .panel.call .stockwrap .ln{animation:none !important;}
+    footer{display:none !important;}
+    /* stack every multi-column block so it reads cleanly on a phone, either orientation */
+    .ladder,.triad,.casebook{flex-direction:column;}
+    .ladder .rung+.rung,.triad .tri+.tri,.casebook .cb+.cb{border-left:1px solid var(--line);border-top:0;}
+    .flow3,.shocks,.chips,.proof,.prov{grid-template-columns:1fr;}
+    .conn,.ladder-arrow{transform:rotate(90deg);}
+  }
 </style>
 </head>
 <body>
@@ -622,7 +645,10 @@
       default: if(/^[0-9]$/.test(e.key)) show(parseInt(e.key,10));
     }
   });
-  document.getElementById('stage').addEventListener('click',e=>{(e.clientX<window.innerWidth*0.28)?show(idx-1):show(idx+1);});
+  const touch = window.matchMedia('(pointer:coarse)').matches;
+  if(!touch){
+    document.getElementById('stage').addEventListener('click',e=>{(e.clientX<window.innerWidth*0.28)?show(idx-1):show(idx+1);});
+  }
   show(0);
 })();
 </script>
