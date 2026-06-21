@@ -1,0 +1,13 @@
+[project]
+name = "latitude"
+version = "0.1.0"
+description = "Latitude — autonomous GPU compute-procurement RL environment (HUD v6)"
+requires-python = ">=3.12"
+dependencies = [
+    "hud-python==0.6.6",
+    "fastmcp==3.0.2",
+    "numpy==2.4.6",
+]
+
+[tool.uv]
+package = false

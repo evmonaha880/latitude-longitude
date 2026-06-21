@@ -1,0 +1,19 @@
+# Latitude — HUD v6 environment container.
+# Built remotely by `hud deploy .`; also runs on every platform job + during
+# deploy introspection. Pinned to the proven-local stack (Python 3.12,
+# hud-python 0.6.6, fastmcp 3.0.2, numpy 2.4.6) so the container matches what
+# trained successfully locally.
+FROM python:3.12-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY pyproject.toml uv.lock* ./
+RUN pip install uv && uv sync --frozen --no-dev 2>/dev/null || uv sync --no-dev
+COPY . .
+
+# Serve the Environment's control channel (tcp JSON-RPC) on 8765.
+# env:env  -> import env.py, use its `env = Environment(name="latitude")` object.
+EXPOSE 8765
+CMD ["uv", "run", "hud", "serve", "env:env", "--host", "0.0.0.0", "--port", "8765"]
