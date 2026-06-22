@@ -278,19 +278,22 @@
     .shocks,.chips,.proof,.prov{grid-template-columns:1fr;}
   }
 
-  /* ── TOUCH DEVICES: vertical scroll-through (portrait + landscape) ── */
+  /* ── TOUCH DEVICES: JS swipe-pager — one page per swipe (portrait + landscape) ──
+     The shell is a fixed clip-frame; .stage is a tall track translated by JS.
+     Each swipe advances one viewport "page"; tall slides get an extra bottom
+     page-stop (set in JS) so their punchline content is always reachable. ── */
   @media (pointer: coarse){
-    html,body{overflow:auto !important;height:auto !important;}
-    html{scroll-snap-type:y proximity;scroll-padding-top:0;}
-    body{overflow-x:hidden !important;}
-    .shell{position:static;inset:auto;margin:8px;min-height:calc(100svh - 16px);overflow:visible;}
+    html,body{overflow:hidden !important;height:100% !important;}
+    body{overflow-x:hidden !important;touch-action:none;overscroll-behavior:none;}
+    .shell{position:fixed;inset:8px;margin:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
     .shell::before,.shell::after{display:none;}
-    .stage{position:static;display:block;flex:none;min-height:0;}
-    /* each slide is a full page; proximity-snap lands the next page fully without
-       trapping the slides that are taller than the viewport (they stay scrollable) */
+    header{flex:0 0 auto;}
+    .stage{position:relative;display:block;flex:1 1 auto;min-height:0;overflow:visible;
+      transform:translate3d(0,0,0);will-change:transform;
+      transition:transform .42s cubic-bezier(.22,.61,.36,1);}
+    /* each slide fills the visible stage = one full page; tall ones grow past it */
     .slide{position:static;inset:auto;opacity:1 !important;visibility:visible !important;
-      min-height:100vh;min-height:100svh;padding:8vh 7vw;border-bottom:1px solid var(--line);
-      scroll-snap-align:start;scroll-snap-stop:always;}
+      min-height:100%;padding:7vh 7vw;border-bottom:1px solid var(--line);}
     .slide:last-of-type{border-bottom:0;}
     /* everything visible — entrance animations need slide-activation that doesn't fire on scroll */
     .reveal,.seqfade{opacity:1 !important;transform:none !important;}
@@ -650,10 +653,60 @@
     }
   });
   const touch = window.matchMedia('(pointer:coarse)').matches;
+  const stage = document.getElementById('stage');
   if(!touch){
-    document.getElementById('stage').addEventListener('click',e=>{(e.clientX<window.innerWidth*0.28)?show(idx-1):show(idx+1);});
+    stage.addEventListener('click',e=>{(e.clientX<window.innerWidth*0.28)?show(idx-1):show(idx+1);});
+    show(0);
+  } else {
+    // ── TOUCH: one-page-per-swipe pager ──
+    show(0); // CSS forces all slides visible on touch; this just seeds state
+    let stops=[], pi=0, maxPos=0;
+    const V=()=>stage.clientHeight;
+    function build(){
+      const vh=V(); const next=[];
+      slides.forEach(s=>{
+        const top=s.offsetTop, h=s.offsetHeight, bottom=top+h-vh;
+        next.push(top);
+        if(h>vh+8){ let p=top+vh; while(p<bottom-8){next.push(p);p+=vh;} next.push(bottom); }
+      });
+      const raw=[...new Set(next.map(v=>Math.max(0,Math.round(v))))].sort((a,b)=>a-b);
+      const gap=vh*0.12; stops=[];               // drop stops too close to matter
+      raw.forEach(v=>{ if(!stops.length||v-stops[stops.length-1]>=gap) stops.push(v); });
+      const mx=raw[raw.length-1]||0;             // but always keep the true bottom reachable
+      if(stops[stops.length-1]<mx){ (mx-stops[stops.length-1]>=gap)?stops.push(mx):stops[stops.length-1]=mx; }
+      maxPos=stops.length?stops[stops.length-1]:0;
+      pi=Math.min(pi,stops.length-1);
+      const keep=stage.style.transition; stage.style.transition='none';
+      apply(); void stage.offsetWidth; stage.style.transition=keep;
+    }
+    function apply(){ stage.style.transform='translate3d(0,'+(-stops[pi]||0)+'px,0)'; }
+    let sy=0,sx=0,base=0,drag=false,locked=false;
+    window.addEventListener('touchstart',e=>{
+      if(e.touches.length!==1) return;
+      sy=e.touches[0].clientY; sx=e.touches[0].clientX; base=stops[pi]||0;
+      drag=true; locked=false; stage.style.transition='none';
+    },{passive:true});
+    window.addEventListener('touchmove',e=>{
+      if(!drag) return;
+      const dy=e.touches[0].clientY-sy, dx=e.touches[0].clientX-sx;
+      if(!locked){ if(Math.abs(dx)>Math.abs(dy)+4){drag=false;return;} locked=true; }
+      e.preventDefault();
+      let np=base-dy;
+      if(np<0) np*=0.35; else if(np>maxPos) np=maxPos+(np-maxPos)*0.35;
+      stage.style.transform='translate3d(0,'+(-np)+'px,0)';
+    },{passive:false});
+    window.addEventListener('touchend',e=>{
+      if(!drag) return; drag=false; stage.style.transition='';
+      const dy=e.changedTouches[0].clientY-sy, thr=Math.min(90,V()*0.16);
+      if(dy<=-thr) pi=Math.min(stops.length-1,pi+1);
+      else if(dy>=thr) pi=Math.max(0,pi-1);
+      apply();
+    },{passive:true});
+    window.addEventListener('resize',build);
+    window.addEventListener('orientationchange',()=>setTimeout(build,260));
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>setTimeout(build,40));
+    setTimeout(build,60); setTimeout(build,420);
   }
-  show(0);
 })();
 </script>
 </body>
