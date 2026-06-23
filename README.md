@@ -34,7 +34,7 @@ Longitude's agent independently found the winning policy: qualify TPU on day 0, 
 
 ## Judge brief
 
-Self-contained HTML walkthrough, served live at **[evmonaha880.github.io/latitude-longitude](https://evmonaha880.github.io/latitude-longitude/)** (source: [`web/judge-brief.html`](web/judge-brief.html) — zero external dependencies, opens offline).
+Self-contained HTML walkthrough, served live at **[evmonaha880.github.io/latitude-longitude](https://evmonaha880.github.io/latitude-longitude/)** (source: [`index.html`](index.html) — zero external dependencies, opens offline).
 
 ## Run it
 
