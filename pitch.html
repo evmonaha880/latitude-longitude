@@ -321,14 +321,16 @@
     .flow3,.shocks,.chips,.proof,.prov{grid-template-columns:1fr;}
     .ladder,.grp-label,.triad,.shocks,.chips,.proof,.prov,.flow3,.memocard,.casebook,.map,.bigcase{width:100%;}
     .grp-label{flex-direction:column;gap:.3vh;text-align:center;}
-    .ladder-arrow{transform:rotate(90deg);padding:.6vh 0;}
-    .conn{transform:rotate(90deg);height:34px;margin:.6vh 0;}
-    .two .vs{transform:rotate(90deg);margin:1.6vh 0;}
-    /* arrows must keep their ↓ rotation THROUGH the entrance animation —
-       the default riseIn ends at translateY(0), which would un-rotate them back to → */
-    .slide.in .ladder-arrow,.slide.in .conn,.slide.in .two .vs{
-      animation:riseInDown .7s cubic-bezier(.2,.75,.2,1) both;animation-delay:var(--d,0s);}
-    @keyframes riseInDown{from{opacity:0;transform:translateY(18px) rotate(90deg)}to{opacity:1;transform:rotate(90deg)}}
+    /* purpose-drawn down-chevrons replace the rotated → glyphs (which read as tilted).
+       Same clean ↓ cue on the ladder, the calm→storm pivot, and the demo connectors. */
+    .ladder-arrow,.conn,.two .vs{display:flex;align-items:center;justify-content:center;
+      font-size:0;color:transparent;}
+    .ladder-arrow{padding:.5vh 0;} .conn{height:30px;margin:.4vh 0;} .two .vs{margin:1.4vh 0;}
+    .conn svg{display:none;}
+    .ladder-arrow::after,.conn::after,.two .vs::after{
+      content:"";display:block;width:13px;height:13px;border-radius:1px;
+      border-right:2.5px solid var(--amber);border-bottom:2.5px solid var(--amber);
+      transform:rotate(45deg);}
     .sub,.setup{max-width:100%;}
     .quotebox{max-width:100%;}
 
