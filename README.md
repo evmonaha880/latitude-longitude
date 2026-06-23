@@ -2,6 +2,8 @@
 
 **RL environments for the million-dollar compute call.**
 
+**[▶ Pitch deck](https://evmonaha880.github.io/latitude-longitude/pitch.html)** · **[Judge brief](https://evmonaha880.github.io/latitude-longitude/)** · **[Live on HUD](https://hud.ai/environments/610f6fb5)**
+
 Interpreting and predicting are basically solved. Deciding and acting — under fire, with real money on the line — is where AI's value is heading. These two composable HUD environments grade exactly that: the GPU buy-and-hedge calls a compute team makes every week, through real supply-chain crises instead of calm demand.
 
 Built solo for the HUD Frontier RSI RL Environments Hackathon (June 2026).
@@ -32,7 +34,7 @@ Longitude's agent independently found the winning policy: qualify TPU on day 0, 
 
 ## Judge brief
 
-Self-contained HTML walkthrough: [`web/judge-brief.html`](web/judge-brief.html) (also served at the repo's GitHub Pages URL). Zero external dependencies — opens offline.
+Self-contained HTML walkthrough, served live at **[evmonaha880.github.io/latitude-longitude](https://evmonaha880.github.io/latitude-longitude/)** (source: [`web/judge-brief.html`](web/judge-brief.html) — zero external dependencies, opens offline).
 
 ## Run it
 
